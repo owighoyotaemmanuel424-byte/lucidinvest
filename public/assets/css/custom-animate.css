@@ -905,7 +905,7 @@
     Animation2 Css
 =============================================
 ***/
-@animation2 {
+@keyframes animation2 {
   0% {
     -webkit-transform: rotateY(0deg);
     transform: rotateY(0deg)
@@ -1242,7 +1242,7 @@
 
 
 
-@service_hexagon_2 {
+@keyframes service_hexagon_2 {
   0% {
     -webkit-transform: rotateY(0deg);
     transform: rotateY(0deg)
