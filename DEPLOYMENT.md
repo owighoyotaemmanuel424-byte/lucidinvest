@@ -1,30 +1,33 @@
-# Upload to AsuraHosting shared Node.js hosting
+# Deployment and Neon PostgreSQL
 
-This is a Next.js application with a server API, so it needs hosting that provides a **Node.js Application** feature (Node.js 20.9 or later). Do not upload it directly to `public_html` as a normal HTML website.
+LucidInvest remains a Next.js application on Vercel. Neon PostgreSQL is the persistent database. Browser code must never connect directly to Neon.
 
-## Recommended: use the prebuilt upload package
+## 1. Create and configure Neon
 
-Use `lucid-global-invest-prebuilt-deploy.zip`. It already contains the production `.next` folder, so the server does **not** need to build the application. This avoids the shared-hosting memory-limit error.
+1. Create a Neon project and select a region near the Vercel deployment.
+2. Copy the pooled PostgreSQL connection string for runtime use and require SSL (sslmode=require).
+3. In Vercel → Project → Settings → Environment Variables, add DATABASE_URL for Preview and Production only when each environment is ready.
+4. Keep the value server-only. Never prefix it with NEXT_PUBLIC_. Never commit credentials, logs containing secrets, or .env.local.
 
-1. In cPanel, open **Setup Node.js App** and create an application with Node.js 20+.
-2. Use an application root outside `public_html`, for example `lucid-global-invest`.
-3. Stop the current Node.js application.
-4. Upload and extract `lucid-global-invest-prebuilt-deploy.zip` into that application root, replacing the old application files.
-5. Set the startup file to `server.js`.
-6. Open the cPanel terminal, change to the application root, then run this command once:
+## 2. Apply the initial schema safely
 
-   ```bash
-   npm ci --omit=dev
-   ```
+Review migrations/0001_initial.sql before applying it. Apply it in the Neon SQL Editor against a new or explicitly verified empty database. Do not apply it to an existing database until its current schema/data have been inspected and a backup/export is verified. IF NOT EXISTS is not a substitute for reviewing an existing schema.
 
-7. Click **Restart** for the Node.js application. Do **not** run `npm run build` on the hosting server.
+The schema establishes users, customer accounts, investment products, investments, a double-entry ledger foundation, audit events, contact enquiries, and migration tracking. It does not import or fabricate customer records, passwords, account balances, or investments.
 
-The app uses the `PORT` supplied by the host automatically. AsuraHosting advertises a Node.js launcher with selectable Node versions and custom-package installation, so this deployment approach fits its shared Node.js plans. [AsuraHosting Node.js hosting](https://www.asurahosting.com/nodejs-hosting)
+## 3. Verify the connection
 
-For future changes, build the project locally first, upload the new prebuilt ZIP, then restart the application.
+After setting DATABASE_URL and applying the migration, deploy the app and visit /api/health. A successful response indicates database=connected. A missing or unreachable database returns HTTP 503 without exposing credentials or raw database errors.
 
-## Important
+The contact form writes enquiries to contact_enquiries; it does not send email. It returns an error rather than pretending to save if the database is unavailable.
 
-- The ZIP intentionally does not contain `node_modules`; `npm ci --omit=dev` creates the Linux-compatible runtime dependencies. It **does** contain the completed `.next` production output.
-- The contact endpoint (`/api/contact`) currently only writes submitted data to the server log. It does not send email or save enquiries in a database.
-- If the hosting plan has no **Setup Node.js App** feature, it cannot run this version of the site. Ask the host to enable Node.js hosting or move to a Node-compatible plan.
+## 4. Financial and authentication safety
+
+- No sign-in, registration, deposit, withdrawal, trade, investment purchase, or balance-changing endpoint is enabled by this database foundation.
+- The repository did not contain an established authentication/session system during this implementation. Before adding account access, implement and test server-side authentication, sessions, role checks, and account-ownership checks. Never trust client-side roles.
+- Do not expose ledger writes until a reviewed service enforces idempotency, atomic transactions, balanced debit/credit entries, concurrency controls, audit records, and reconciliation.
+- Keep demo and production data separate. Test migrations on a non-production Neon branch first. Back up and verify production data before any migration. Never seed fake balances or sample production users.
+
+## Local development
+
+Copy .env.example to .env.local, replace the placeholder with a Neon connection string, then run npm install and npm run dev. Do not commit .env.local.
