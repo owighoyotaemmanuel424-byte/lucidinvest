@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     `;
     const user = Array.isArray(rows) ? rows[0] : undefined;
     if (!user || Array.isArray(user) || typeof user !== "object" || !("id" in user)) {
-      return NextResponse.json({ error: "An account with this email may already exist." }, { status: 409 });
+      return NextResponse.json({ error: "An account with this email already exists. Please sign in instead. If you cannot access the account, use the verified account-recovery process; do not create a duplicate account." }, { status: 409, headers: { "Cache-Control": "no-store" } });
     }
     await createSession(String(user.id));
     return NextResponse.json({ user: { id: user.id, email: user.email, name: user.full_name, role: user.role } }, { status: 201, headers: { "Cache-Control": "no-store" } });
