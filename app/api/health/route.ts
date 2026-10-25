@@ -10,8 +10,12 @@ export async function GET() {
   }
   try {
     const rows = await getSql()`SELECT current_timestamp AS checked_at`;
+    const firstRow = Array.isArray(rows) ? rows[0] : undefined;
+    const checkedAt = firstRow && !Array.isArray(firstRow) && typeof firstRow === "object" && "checked_at" in firstRow
+      ? firstRow.checked_at
+      : null;
     return NextResponse.json(
-      { ok: true, database: "connected", checkedAt: rows[0]?.checked_at ?? null },
+      { ok: true, database: "connected", checkedAt },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch {
