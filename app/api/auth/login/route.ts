@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
     const rows = await getSql()`
       SELECT id, email, full_name, role, status, password_hash
-      FROM app_users WHERE email = ${email} LIMIT 1
+      FROM app_users WHERE lower(email) = ${email} LIMIT 1
     `;
     const user = Array.isArray(rows) ? rows[0] : undefined;
     const validRow = user && !Array.isArray(user) && typeof user === "object" && "password_hash" in user;
