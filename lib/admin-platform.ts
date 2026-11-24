@@ -478,7 +478,7 @@ export async function getPlatformSettings() {
   return found;
 }
 
-export type LiveChatProvider = "tawk" | "crisp" | "intercom" | "chatwoot";
+export type LiveChatProvider = "tawk" | "crisp" | "intercom" | "chatwoot" | "smartsupp";
 export type LiveChatSettings = { enabled:boolean; provider:LiveChatProvider; siteId:string; siteUrl:string };
 const DEFAULT_LIVE_CHAT:LiveChatSettings={enabled:true,provider:"tawk",siteId:"6a988eb8a0ffc53446f9b976/1k1hur10v",siteUrl:""};
 function validLiveChatSettings(v:LiveChatSettings):boolean {
@@ -486,12 +486,13 @@ function validLiveChatSettings(v:LiveChatSettings):boolean {
  if(v.provider==="crisp")return /^[a-f0-9-]{20,40}$/i.test(v.siteId);
  if(v.provider==="intercom")return /^[a-z0-9]{6,16}$/i.test(v.siteId);
  if(v.provider==="chatwoot"){if(!/^[a-z0-9_-]{8,128}$/i.test(v.siteId))return false;try{return new URL(v.siteUrl).protocol==="https:";}catch{return false;}}
+ if(v.provider==="smartsupp")return /^[a-z0-9_-]{10,64}$/i.test(v.siteId);
  return false;
 }
 export async function getLiveChatSettings():Promise<LiveChatSettings>{
  const sql=getSql();const found=rows<{value:unknown}>(await sql`SELECT value FROM platform_settings WHERE key='live_chat' LIMIT 1`);
  const value=found[0]?.value;if(!value||typeof value!=="object"||Array.isArray(value))return DEFAULT_LIVE_CHAT;
- const saved=value as Record<string,unknown>;const provider=["tawk","crisp","intercom","chatwoot"].includes(String(saved.provider))?saved.provider as LiveChatProvider:"tawk";
+ const saved=value as Record<string,unknown>;const provider=["tawk","crisp","intercom","chatwoot","smartsupp"].includes(String(saved.provider))?saved.provider as LiveChatProvider:"tawk";
  const legacy=typeof saved.propertyId==="string"&&typeof saved.widgetId==="string"?saved.propertyId+"/"+saved.widgetId:DEFAULT_LIVE_CHAT.siteId;
  const config:LiveChatSettings={enabled:saved.enabled===false?false:saved.enabled===true,provider,siteId:typeof saved.siteId==="string"?saved.siteId:legacy,siteUrl:typeof saved.siteUrl==="string"?saved.siteUrl:""};
  return validLiveChatSettings(config)?config:{...config,enabled:false,siteId:""};
