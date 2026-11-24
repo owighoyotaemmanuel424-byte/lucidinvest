@@ -574,3 +574,4 @@ export default function DashboardShell({
       </div>
     </div>
   );
+}
