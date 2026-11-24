@@ -15,7 +15,7 @@ export default async function AdminLiveChatPage() {
       <PageHeader
         eyebrow="Customer experience"
         title="Live chat configuration"
-        lead="Manage the customer-facing website chat launcher and connect your Tawk.to property without editing application code."
+        lead="Choose and configure the customer-facing live chat provider without editing application code."
       />
       <section className={styles.panel} aria-labelledby="chat-status">
         <div className={styles.panelHead}>
@@ -30,12 +30,13 @@ export default async function AdminLiveChatPage() {
       <section className={styles.panel} aria-labelledby="chat-checklist">
         <h2 id="chat-checklist" className={styles.panelTitle}>Setup checklist</h2>
         <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 9, color: "var(--li-ink, #20364a)", fontSize: 14, lineHeight: 1.6 }}>
-          <li>Copy the Property ID and Widget ID from your Tawk.to widget installation settings.</li>
-          <li>Paste both identifiers above and enable the chat launcher.</li>
+          <li>Select Tawk.to, Crisp, Intercom, or Chatwoot from the provider list.</li>
+          <li>Copy the public website embed identifier from that provider's installation settings.</li>
+          <li>For Chatwoot, also enter your HTTPS installation URL.</li>
           <li>Save, then open the public website in a fresh tab to verify the launcher.</li>
-          <li>Manage agent availability, chat routing, and canned responses inside your Tawk.to dashboard.</li>
+          <li>Manage availability, routing, and conversations inside the selected provider's inbox.</li>
         </ol>
-        <p className={styles.hint}>The chat provider handles visitor conversations. This page controls the embedded widget and does not store chat transcripts or provider passwords.</p>
+        <p className={styles.hint}>Only one provider is loaded at a time. This page stores public embed identifiers, not passwords, private API keys, or chat transcripts.</p>
       </section>
     </>
   );
