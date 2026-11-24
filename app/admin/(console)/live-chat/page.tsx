@@ -30,9 +30,9 @@ export default async function AdminLiveChatPage() {
       <section className={styles.panel} aria-labelledby="chat-checklist">
         <h2 id="chat-checklist" className={styles.panelTitle}>Setup checklist</h2>
         <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 9, color: "var(--li-ink, #20364a)", fontSize: 14, lineHeight: 1.6 }}>
-          <li>Select Tawk.to, Crisp, Intercom, or Chatwoot from the provider list.</li>
+          <li>Select Tawk.to, Crisp, Intercom, Chatwoot, or Smartsupp from the provider list.</li>
           <li>Copy the public website embed identifier from that provider's installation settings.</li>
-          <li>For Chatwoot, also enter your HTTPS installation URL.</li>
+          <li>For Chatwoot, also enter your HTTPS installation URL. For Smartsupp, enter the unique chat code from your Smartsupp dashboard.</li>
           <li>Save, then open the public website in a fresh tab to verify the launcher.</li>
           <li>Manage availability, routing, and conversations inside the selected provider's inbox.</li>
         </ol>
