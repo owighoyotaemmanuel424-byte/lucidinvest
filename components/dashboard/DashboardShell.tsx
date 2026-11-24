@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Menu, X, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import styles from "./dashboard.module.css";
 
 type ShellUser = { name: string; email: string };
@@ -448,6 +449,28 @@ export default function DashboardShell({
   const pathname = usePathname();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      setCollapsed(window.localStorage.getItem("lucid-sidebar-collapsed") === "true");
+    } catch {
+      // Keep the expanded navigation when storage is unavailable.
+    }
+  }, []);
+
+  function toggleCollapsed() {
+    setCollapsed((current) => {
+      const next = !current;
+      try {
+        window.localStorage.setItem("lucid-sidebar-collapsed", String(next));
+      } catch {
+        // The control still works for this session when storage is unavailable.
+      }
+      return next;
+    });
+  }
   const { nav, label } = AREA[area];
   const crossLink: NavItem | null =
     area === "admin"
@@ -527,7 +550,7 @@ export default function DashboardShell({
             <span className={styles.userEmail}>{user.email}</span>
           </div>
           <button type="button" className={styles.signOut} onClick={signOut} disabled={busy}>
-            {busy ? "Signing out…" : "Sign out"}
+            <span className={styles.signOutText}>{busy ? "Signing out…" : "Sign out"}</span>
           </button>
         </div>
       </aside>
