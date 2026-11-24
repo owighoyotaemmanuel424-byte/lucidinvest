@@ -1,7 +1,8 @@
 .shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-columns: 264px minmax(0, 1fr);
+  transition: grid-template-columns 220ms ease;
   background: #f4f7f3;
   color: #051509;
   font-family: var(--thm-font, "Hanken Grotesk", system-ui, sans-serif);
@@ -527,6 +528,22 @@
   font-size: 13.5px;
   line-height: 1.6;
   color: #43584a;
+}
+
+@media (min-width: 901px) {
+  .shellCollapsed .sidebar { padding-left: 12px; padding-right: 12px; align-items: center; }
+  .shellCollapsed .sidebarTop { width: 100%; flex-direction: column; }
+  .shellCollapsed .brand { padding: 7px; width: 48px; overflow: hidden; }
+  .shellCollapsed .brandImage { width: 30px; height: 22px; object-fit: cover; object-position: left; }
+  .shellCollapsed .navLabel,
+  .shellCollapsed .navText,
+  .shellCollapsed .userBlock,
+  .shellCollapsed .signOutText { display: none; }
+  .shellCollapsed .nav { width: 100%; }
+  .shellCollapsed .navItem { justify-content: center; padding: 12px 8px; }
+  .shellCollapsed .sidebarFooter { width: 100%; justify-items: center; }
+  .shellCollapsed .signOut { width: 100%; font-size: 0; }
+  .shellCollapsed .signOut::before { content: "↗"; font-size: 18px; }
 }
 
 @media (max-width: 900px) {
