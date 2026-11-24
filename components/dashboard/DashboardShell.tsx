@@ -330,6 +330,17 @@ const ADMIN_NAV: NavItem[] = [
     ),
   },
   {
+    href: "/admin/live-chat",
+    label: "Live Chat Configuration",
+    icon: (
+      <Icon>
+        <path d="M4 5.5h16v11H9l-5 4z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+        <path d="M8 9.5h8M8 12.5h5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+        <circle cx="18" cy="18" r="2.2" fill="currentColor" />
+      </Icon>
+    ),
+  },
+  {
     href: "/admin/support",
     label: "Support Tickets",
     icon: (
