@@ -11,7 +11,31 @@ export default function LiveChatWidget(){
    else if(config.provider==="crisp"){if(!/^[a-f0-9-]{20,40}$/i.test(config.siteId))return;window.$crisp=[];window.CRISP_WEBSITE_ID=config.siteId;inject("https://client.crisp.chat/l.js","crisp");}
    else if(config.provider==="intercom"){if(!/^[a-z0-9]{6,16}$/i.test(config.siteId))return;window.intercomSettings={app_id:config.siteId};inject("https://widget.intercom.io/widget/"+encodeURIComponent(config.siteId),"intercom");}
    else if(config.provider==="chatwoot"){let base:URL;try{base=new URL(config.siteUrl);}catch{return;}if(base.protocol!=="https:"||!/^[a-z0-9_-]{8,128}$/i.test(config.siteId))return;window.chatwootSettings={websiteToken:config.siteId,baseUrl:base.origin};inject(base.origin+"/packs/js/sdk.js","chatwoot");script?.addEventListener("load",()=>{if(!cancelled)window.chatwootSDK?.run({websiteToken:config.siteId,baseUrl:base.origin});},{once:true});}
-   else if(config.provider==="smartsupp"){if(!/^[a-z0-9_-]{10,64}$/i.test(config.siteId))return;window._smartsupp=window._smartsupp||{};window._smartsupp.key=config.siteId;inject("https://www.smartsuppchat.com/loader.js?","smartsupp");}
+   else if(config.provider==="smartsupp"){
+    // Follow Smartsupp's official installation snippet: create its command
+    // queue before loading the remote loader, otherwise the widget may never initialize.
+    if(!/^[a-z0-9_-]{1,128}$/i.test(config.siteId))return;
+    window._smartsupp=window._smartsupp||{};
+    window._smartsupp.key=config.siteId;
+    if(!window.smartsupp){
+      const queue=((...args:unknown[])=>{queue._.push(args);}) as ((...args:unknown[])=>void)&{_:unknown[]};
+      queue._=[];
+      window.smartsupp=queue;
+    }
+    if(!document.querySelector('script[data-lucid-live-chat="smartsupp"]')){
+      const loader=document.createElement("script");
+      loader.type="text/javascript";
+      loader.charset="utf-8";
+      loader.async=true;
+      loader.src="https://www.smartsuppchat.com/loader.js?";
+      loader.dataset.lucidLiveChat="true";
+      loader.dataset.provider="smartsupp";
+      loader.onerror=()=>loader.remove();
+      const first=document.getElementsByTagName("script")[0];
+      if(first?.parentNode)first.parentNode.insertBefore(loader,first);
+      else document.head.appendChild(loader);
+    }
+   }
   }catch{/* Optional widget: never block the application. */}}
   void load();return()=>{cancelled=true;};
  },[]);return null;
