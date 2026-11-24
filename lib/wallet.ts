@@ -637,6 +637,14 @@ export async function processWalletRequest(
              target.currency
       FROM booked, target
       RETURNING id
+    ), clearing AS (
+      INSERT INTO ledger_entries (transaction_id, ledger_account_id, amount, currency)
+      SELECT booked.id, la.id,
+             CASE WHEN target.kind = 'deposit' THEN -target.amount ELSE target.amount END,
+             trim(target.currency)
+      FROM booked, target
+      JOIN ledger_accounts la ON la.code = 'PLATFORM_CLEARING' AND la.currency = target.currency
+      RETURNING id
     ), audited AS (
       INSERT INTO audit_events (actor_user_id, action, entity_type, entity_id, details)
       SELECT ${actorUserId}, 'wallet.request_posted', 'wallet_request', target.id::text,

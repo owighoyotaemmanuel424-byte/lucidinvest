@@ -23,6 +23,31 @@ export default function Menu() {
         <Link href="/">Home</Link>
       </li>
 
+      {/* Investments */}
+      <li className={`dropdown ${isCurrentOrPrefix(["/investments", "/stocks", "/etfs", "/bonds", "/wealth-management", "/investment-education"]) ? "current" : ""}`}>
+        <Link href="/investments">Investments</Link>
+        <ul className="megamenu clearfix">
+          <li className={isCurrentOrPrefix(["/investments"]) ? "current" : ""}>
+            <Link href="/investments">All Investments</Link>
+          </li>
+          <li className={isCurrentOrPrefix(["/stocks"]) ? "current" : ""}>
+            <Link href="/stocks">Stocks</Link>
+          </li>
+          <li className={isCurrentOrPrefix(["/etfs"]) ? "current" : ""}>
+            <Link href="/etfs">ETFs</Link>
+          </li>
+          <li className={isCurrentOrPrefix(["/bonds"]) ? "current" : ""}>
+            <Link href="/bonds">Bonds</Link>
+          </li>
+          <li className={isCurrentOrPrefix(["/wealth-management"]) ? "current" : ""}>
+            <Link href="/wealth-management">Wealth Management</Link>
+          </li>
+          <li className={isCurrentOrPrefix(["/investment-education"]) ? "current" : ""}>
+            <Link href="/investment-education">Investment Education</Link>
+          </li>
+        </ul>
+      </li>
+
       {/* Markets */}
       <li className={`dropdown ${isCurrentOrPrefix(["/markets", "/markets1-trade-forex", "/markets2-stock-market", "/markets3-commodities-market", "/markets4-crypto-market", "/markets5-futures-market", "/markets6-options-market"]) ? "current" : ""}`}>
         <Link href="/markets">Markets</Link>

@@ -87,6 +87,9 @@ export default function AuthForm({ mode, selectedAccount }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [twoFactorRequired, setTwoFactorRequired] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
@@ -123,20 +126,28 @@ export default function AuthForm({ mode, selectedAccount }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
-        body: JSON.stringify({ ...(registering ? { fullName } : {}), email, password }),
+        body: JSON.stringify({
+          ...(registering ? { fullName, referralCode } : {}),
+          ...(!registering && code ? { code } : {}),
+          email,
+          password,
+        }),
       });
 
       let message = "";
+      let requiresCode = false;
       try {
         const result: unknown = await response.json();
-        if (result && typeof result === "object" && "error" in result && typeof result.error === "string") {
-          message = result.error;
+        if (result && typeof result === "object") {
+          if ("error" in result && typeof result.error === "string") message = result.error;
+          if ("twoFactorRequired" in result && result.twoFactorRequired === true) requiresCode = true;
         }
       } catch {
         /* Non-JSON responses still fall back to the generic message below. */
       }
 
       if (!response.ok) {
+        if (requiresCode) setTwoFactorRequired(true);
         setError(message || "We could not complete your request. Please try again.");
         return;
       }
@@ -274,6 +285,28 @@ export default function AuthForm({ mode, selectedAccount }: Props) {
               )}
             </div>
 
+            {!registering && twoFactorRequired && (
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor={`${uid}-code`}>
+                  Authenticator code
+                </label>
+                <div className={styles.control}>
+                  <input
+                    id={`${uid}-code`}
+                    className={styles.input}
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    placeholder="123456"
+                    maxLength={6}
+                    value={code}
+                    onChange={(event) => setCode(event.target.value)}
+                    required
+                  />
+                </div>
+                <p className={styles.hint}>Open your authenticator app and enter the current six-digit code.</p>
+              </div>
+            )}
+
             {!registering && (
               <p className={styles.switch} style={{ margin: 0 }}>
                 <Link href="/forgot-password">Forgot password?</Link>
@@ -307,6 +340,25 @@ export default function AuthForm({ mode, selectedAccount }: Props) {
                   >
                     <EyeIcon off={showConfirm} />
                   </button>
+                </div>
+              </div>
+            )}
+
+            {registering && (
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor={`${uid}-referral`}>
+                  Referral code <span style={{ fontWeight: 400, opacity: 0.7 }}>(optional)</span>
+                </label>
+                <div className={styles.control}>
+                  <input
+                    id={`${uid}-referral`}
+                    className={styles.input}
+                    autoComplete="off"
+                    placeholder="LI..."
+                    maxLength={20}
+                    value={referralCode}
+                    onChange={(event) => setReferralCode(event.target.value.toUpperCase())}
+                  />
                 </div>
               </div>
             )}

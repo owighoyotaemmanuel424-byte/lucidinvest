@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSession, hashPassword } from "@/lib/auth";
+import { attachReferral } from "@/lib/customer-services";
 import { getSql } from "@/lib/db";
+import { clientKey, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
+    const limit = rateLimit(clientKey(request, "register"), 6, 3600);
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: "Too many registration attempts. Try again later." },
+        { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds), "Cache-Control": "no-store" } },
+      );
+    }
+
     const body: unknown = await request.json();
     if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid request." }, { status: 400 });
     const data = body as Record<string, unknown>;
@@ -30,6 +40,8 @@ export async function POST(request: NextRequest) {
     if (!user || Array.isArray(user) || typeof user !== "object" || !("id" in user)) {
       return NextResponse.json({ error: "An account with this email already exists. Please sign in instead. If you cannot access the account, use the verified account-recovery process; do not create a duplicate account." }, { status: 409, headers: { "Cache-Control": "no-store" } });
     }
+    const referralCode = typeof data.referralCode === "string" ? data.referralCode.trim() : "";
+    if (referralCode) await attachReferral(String(user.id), email, referralCode);
     await createSession(String(user.id));
     return NextResponse.json({ user: { id: user.id, email: user.email, name: user.full_name, role: user.role } }, { status: 201, headers: { "Cache-Control": "no-store" } });
   } catch (error) {

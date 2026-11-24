@@ -92,6 +92,53 @@ Wallet deposits and withdrawals are confirmed from the Wallet requests tab, and 
 - `components/elements/ContactForm.tsx` sends name, email, phone, subject and message to `POST /api/contact`, which validates all five and stores them in `contact_enquiries` (`phone` added by `migrations/0005_contact_phone.sql`).
 - The newsletter form on `/coming-soon` stores enquiries with `subject: 'Coming Soon Notification'`.
 
+## Investment marketplace and wealth platform
+
+The platform now extends the existing Neon/raw-SQL architecture. There is no Prisma in this repository; all schema changes are additive SQL migrations reviewed against the existing tables.
+
+### Migrations
+
+Apply in order after inspecting the target database and taking a backup:
+
+1. `0001`–`0006` as before.
+2. `0007_platform.sql` adds product configuration, market instruments and prices, orders and holdings, KYC submissions and documents, staff roles and permissions, notifications, support tickets, portfolio snapshots, referrals, login events and platform settings. `deposits` and `withdrawals` are read-only views over `wallet_requests`; the wallet ledger remains the single source of truth for cash.
+3. `0008_demo_market_data.sql` publishes clearly simulated instruments and quotes (`is_demo = true`) plus additional plan products. Remove it if you do not want demonstration data.
+4. `0009_ledger_double_entry.sql` adds a chart of accounts with platform clearing accounts and a deferred check that any transaction referenced `ORD-` balances to zero.
+5. `0010_kyc_blobs.sql` adds private KYC document storage (bytes in Postgres, served only through an authorised route).
+
+### Customer dashboard
+
+`/dashboard` now shows total portfolio value, available balance, total invested, unrealised returns, today's change, active investments and pending transactions, with a performance chart, allocation donut and recent ledger activity. Additional pages: `/dashboard/portfolio`, `plans`, `markets`, `buy`, `sell`, `deposit`, `withdraw`, `statements`, `referrals`, `notifications`, `support`. KYC is managed from `/dashboard/profile`; 2FA, sessions and login history from `/dashboard/security`.
+
+### Trading and settlement
+
+- `POST /api/account/orders` records a pending buy or sell at the latest recorded quote. Notional is computed with BigInt-scaled decimals, never floating point.
+- Buys are validated against the account balance less other pending buys; sells against the holding quantity.
+- `PATCH /api/admin/orders/:id` fills or rejects. Filling posts a balanced transaction (customer cash account and `PLATFORM_CLEARING`) and updates the holding in the same statement.
+- A deferred constraint trigger rejects any unbalanced transaction with an `ORD-` reference.
+- No live exchange feed is connected. Simulated quotes are flagged in the database and labelled throughout the UI. `DEMO_MODE=true` adds an explicit demo banner.
+
+### KYC, support, notifications and referrals
+
+- KYC submission, private document upload (`PDF/JPEG/PNG`, max 5 MB) and an authorised download route. Customers can resubmit after a rejection; staff review with a risk rating and rejection reason.
+- Support tickets carry a threaded conversation; staff replies notify the customer and are audited.
+- Notifications are per-customer records; administrators can broadcast to active customers.
+- Referral codes are issued per customer and invitations convert when the address registers with the code.
+
+### Administrator portal
+
+`/admin` now covers overview, customers (with per-customer detail), investor accounts, investments, investment products, deposits, withdrawals, transactions, orders, KYC verification, portfolio management, market data, referrals, support tickets, notifications, reports, staff management, roles and permissions, audit logs and platform settings. Every write re-checks the staff role and, where configured, the role's permission set. Balance edits remain unavailable; money moves only through reviewed ledger postings.
+
+### Reports and security
+
+- `GET /api/reports/:kind?format=csv|pdf` serves customer statements and, for administrators, activity and compliance reports. PDF is generated without an added dependency.
+- Login is rate-limited, records every attempt in `login_events`, and supports TOTP two-factor authentication (enabled from `/dashboard/security`).
+- Session handling, same-origin checks and scrypt hashing from the existing implementation are unchanged. All new write routes require a live session and a same-origin request.
+
+### Environment
+
+`DATABASE_URL` and `AUTH_SECRET` are still required. Optional: `ADMIN_SETUP_KEY` for the one-time admin claim and `DEMO_MODE=true` for simulated activity. See `.env.example`.
+
 ## Local development
 
 ```sh

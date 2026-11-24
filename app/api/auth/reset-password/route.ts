@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { hashPassword } from "@/lib/auth";
 import { isSameOriginRequest } from "@/lib/same-origin";
 import { resetPasswordWithToken } from "@/lib/password-reset";
+import { clientKey, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,6 +32,14 @@ export async function POST(request: NextRequest) {
     }
     if (password.length < 12 || password.length > 128) {
       return NextResponse.json({ error: "Choose a password of 12–128 characters." }, { status: 400, headers: noStore });
+    }
+
+    const limit = rateLimit(clientKey(request, "reset-password"), 10, 900);
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: "Too many reset attempts. Try again later." },
+        { status: 429, headers: { ...noStore, "Retry-After": String(limit.retryAfterSeconds) } },
+      );
     }
 
     const passwordHash = await hashPassword(password);

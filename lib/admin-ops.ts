@@ -172,6 +172,12 @@ export async function setInvestmentStatus(
       SELECT booked.id, target.account_id, target.principal, target.currency
       FROM booked, target
       RETURNING id
+    ), clearing_entry AS (
+      INSERT INTO ledger_entries (transaction_id, ledger_account_id, amount, currency)
+      SELECT booked.id, la.id, -target.principal, trim(target.currency)
+      FROM booked, target
+      JOIN ledger_accounts la ON la.code = 'PLATFORM_CLEARING' AND la.currency = target.currency
+      RETURNING id
     ), audited AS (
       INSERT INTO audit_events (actor_user_id, action, entity_type, entity_id, details)
       SELECT ${actorUserId}, 'investment.approved', 'investment', target.id::text,

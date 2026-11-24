@@ -59,6 +59,22 @@ export default function MobileMenu({ handleMobileMenu }: MobileMenuProps) {
                 </Link>
               </li>
 
+              {/* Investments */}
+              <li className={`dropdown ${activeDropdown === 7 ? "current" : ""}`}>
+                <Link href="/investments">Investments</Link>
+                <ul style={{ display: activeDropdown === 7 ? "block" : "none" }}>
+                  <li><Link href="/investments" onClick={handleMobileMenu}>All Investments</Link></li>
+                  <li><Link href="/stocks" onClick={handleMobileMenu}>Stocks</Link></li>
+                  <li><Link href="/etfs" onClick={handleMobileMenu}>ETFs</Link></li>
+                  <li><Link href="/bonds" onClick={handleMobileMenu}>Bonds</Link></li>
+                  <li><Link href="/wealth-management" onClick={handleMobileMenu}>Wealth Management</Link></li>
+                  <li><Link href="/investment-education" onClick={handleMobileMenu}>Investment Education</Link></li>
+                </ul>
+                <div className={`dropdown-btn ${activeDropdown === 7 ? "open" : ""}`} onClick={() => toggleDropdown(7)}>
+                  <span className="fa fa-angle-right" />
+                </div>
+              </li>
+
               {/* Markets */}
               <li className={`dropdown ${activeDropdown === 2 ? "current" : ""}`}>
                 <Link href="/markets">Markets</Link>
