@@ -513,18 +513,25 @@ export default function DashboardShell({
   }
 
   return (
-    <div className={styles.shell}>
-      <aside className={styles.sidebar}>
-        <Link href="/" className={styles.brand} aria-label="Lucid Global Invest home">
-          <Image
-            src="/assets/images/resources/lucid-global-invest-logo.png"
-            alt="Lucid Global Invest"
-            width={142}
-            height={71}
-            className={styles.brandImage}
-            priority
-          />
-        </Link>
+    <div className={`${styles.shell} ${collapsed ? styles.shellCollapsed : ""}`}>
+      {mobileOpen && <button type="button" className={styles.mobileBackdrop} aria-label="Close navigation" onClick={() => setMobileOpen(false)} />}
+      <aside className={`${styles.sidebar} ${mobileOpen ? styles.sidebarOpen : ""}`}>
+        <div className={styles.sidebarTop}>
+          <Link href="/" className={styles.brand} aria-label="Lucid Global Invest home">
+            <Image
+              src="/assets/images/resources/lucid-global-invest-logo.png"
+              alt="Lucid Global Invest"
+              width={142}
+              height={71}
+              className={styles.brandImage}
+              priority
+            />
+          </Link>
+          <button type="button" className={styles.collapseButton} onClick={toggleCollapsed} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!collapsed} title={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
+            {collapsed ? <PanelLeftOpen size={19} /> : <PanelLeftClose size={19} />}
+          </button>
+          <button type="button" className={styles.mobileClose} onClick={() => setMobileOpen(false)} aria-label="Close navigation"><X size={20} /></button>
+        </div>
 
         <p className={styles.navLabel}>{label}</p>
         <nav className={styles.nav} aria-label={area === "admin" ? "Admin" : "Dashboard"}>
@@ -536,9 +543,11 @@ export default function DashboardShell({
                 href={item.href}
                 className={`${styles.navItem} ${active ? styles.navItemActive : ""}`}
                 aria-current={active ? "page" : undefined}
+                title={collapsed ? item.label : undefined}
+                onClick={() => setMobileOpen(false)}
               >
                 <span className={styles.navIcon}>{item.icon}</span>
-                {item.label}
+                <span className={styles.navText}>{item.label}</span>
               </Link>
             );
           })}
@@ -556,8 +565,12 @@ export default function DashboardShell({
       </aside>
 
       <div className={styles.main}>
+        <header className={styles.mobileHeader}>
+          <button type="button" className={styles.mobileMenuButton} onClick={() => setMobileOpen(true)} aria-label="Open navigation" aria-expanded={mobileOpen}><Menu size={21} /></button>
+          <span className={styles.mobileHeaderTitle}>LucidInvest</span>
+          <span className={styles.mobileHeaderArea}>{label}</span>
+        </header>
         <div className={styles.content}>{children}</div>
       </div>
     </div>
   );
-}
