@@ -98,7 +98,7 @@ The platform now extends the existing Neon/raw-SQL architecture. There is no Pri
 
 ### Migrations
 
-The application also applies pending migrations itself at server startup (and before a sign-in query runs), so a deploy cannot serve new code against an old schema. Every script is additive and idempotent, and applied versions are recorded in `schema_migrations`. Set `AUTO_MIGRATE=0` to disable this and run the scripts by hand instead. Review this list and take a backup before the first automatic upgrade.
+Migrations are an explicit deployment step, never part of a request. `npm run migrate` applies every pending script and records it in `schema_migrations`; `vercel-build` runs it before `next build`, so a Vercel deployment upgrades the database first and the build fails (rather than shipping) if the upgrade fails. Elsewhere, run it with `DATABASE_URL=... npm run migrate`. Every script is additive and idempotent. Review this list and take a backup before the first upgrade.
 
 Apply in order after inspecting the target database and taking a backup:
 
@@ -139,7 +139,7 @@ Apply in order after inspecting the target database and taking a backup:
 
 ### Environment
 
-`DATABASE_URL` and `AUTH_SECRET` are still required. Optional: `ADMIN_SETUP_KEY` for the one-time admin claim, `DEMO_MODE=true` for simulated activity and `AUTO_MIGRATE=0` to disable startup schema upgrades. See `.env.example`.
+`DATABASE_URL` and `AUTH_SECRET` are still required. Optional: `ADMIN_SETUP_KEY` for the one-time admin claim and `DEMO_MODE=true` for simulated activity. See `.env.example`.
 
 ## Local development
 

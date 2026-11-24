@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSession, verifyPassword } from "@/lib/auth";
 import { getSql } from "@/lib/db";
 import { clientKey, rateLimit } from "@/lib/rate-limit";
-import { ensureDatabaseSchema } from "@/lib/schema";
 import { verifyTotp } from "@/lib/totp";
 
 export const runtime = "nodejs";
@@ -60,19 +59,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Authentication is not configured on this deployment." },
         { status: 503, headers: noStore },
-      );
-    }
-
-    // A deployment can reach a database that has not recorded the newest
-    // additive migrations yet. Upgrade it before running the new query so an
-    // old schema never turns every sign-in into a 500. A failure in a later,
-    // unrelated migration must not block sign-in once the auth columns exist.
-    try {
-      await ensureDatabaseSchema();
-    } catch (error) {
-      console.error(
-        "Schema upgrade before sign-in failed",
-        error instanceof Error ? error.message : "unknown error",
       );
     }
 
