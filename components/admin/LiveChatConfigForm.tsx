@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/components/dashboard/dashboard.module.css";
 
-type Config = { enabled: boolean; provider: "tawk"; propertyId: string; widgetId: string; welcomeMessage: string };
+type Config = { enabled: boolean; provider: "tawk"; propertyId: string; widgetId: string };
 
 export default function LiveChatConfigForm({ initial }: { initial: Config }) {
   const router = useRouter();
@@ -68,12 +68,6 @@ export default function LiveChatConfigForm({ initial }: { initial: Config }) {
           <input id="live-chat-widget" className={styles.input} value={config.widgetId} disabled={busy}
             placeholder="Your Tawk.to widget ID" required maxLength={64}
             onChange={(event) => setConfig((current) => ({ ...current, widgetId: event.target.value.trim() }))} />
-        </div>
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="live-chat-welcome">Welcome message</label>
-          <input id="live-chat-welcome" className={styles.input} value={config.welcomeMessage} disabled={busy}
-            maxLength={120} placeholder="Welcome to LucidInvest. How can we help?"
-            onChange={(event) => setConfig((current) => ({ ...current, welcomeMessage: event.target.value }))} />
         </div>
       </div>
       <div className={styles.formActions}>
