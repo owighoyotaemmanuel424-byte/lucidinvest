@@ -478,6 +478,68 @@ export async function getPlatformSettings() {
   return found;
 }
 
+export type LiveChatSettings = {
+  enabled: boolean;
+  provider: "tawk";
+  propertyId: string;
+  widgetId: string;
+  welcomeMessage: string;
+};
+
+const DEFAULT_LIVE_CHAT: LiveChatSettings = {
+  enabled: true,
+  provider: "tawk",
+  propertyId: "6a988eb8a0ffc53446f9b976",
+  widgetId: "1k1hur10v",
+  welcomeMessage: "Welcome to LucidInvest. How can we help?",
+};
+
+export async function getLiveChatSettings(): Promise<LiveChatSettings> {
+  const sql = getSql();
+  const found = rows<{ value: unknown }>(await sql`
+    SELECT value FROM platform_settings WHERE key = 'live_chat' LIMIT 1
+  `);
+  const value = found[0]?.value;
+  if (!value || typeof value !== "object" || Array.isArray(value)) return DEFAULT_LIVE_CHAT;
+  const saved = value as Record<string, unknown>;
+  const enabled = saved.enabled === false ? false : saved.enabled === true ? true : DEFAULT_LIVE_CHAT.enabled;
+  const propertyId = typeof saved.propertyId === "string" ? saved.propertyId : DEFAULT_LIVE_CHAT.propertyId;
+  const widgetId = typeof saved.widgetId === "string" ? saved.widgetId : DEFAULT_LIVE_CHAT.widgetId;
+  const welcomeMessage = typeof saved.welcomeMessage === "string" ? saved.welcomeMessage.slice(0, 120) : DEFAULT_LIVE_CHAT.welcomeMessage;
+  if (!/^[a-f0-9]{16,64}$/i.test(propertyId) || !/^[a-z0-9]{6,64}$/i.test(widgetId)) {
+    return { ...DEFAULT_LIVE_CHAT, enabled: false };
+  }
+  return { enabled, provider: "tawk", propertyId, widgetId, welcomeMessage };
+}
+
+export async function saveLiveChatSettings(
+  actorUserId: string,
+  value: LiveChatSettings,
+): Promise<Outcome<{ key: string }>> {
+  if (!/^[a-f0-9]{16,64}$/i.test(value.propertyId) || !/^[a-z0-9]{6,64}$/i.test(value.widgetId)) {
+    return { ok: false, status: 400, error: "Invalid Tawk.to widget identifiers." };
+  }
+  const safeValue: LiveChatSettings = {
+    enabled: value.enabled,
+    provider: "tawk",
+    propertyId: value.propertyId,
+    widgetId: value.widgetId,
+    welcomeMessage: value.welcomeMessage.slice(0, 120),
+  };
+  const sql = getSql();
+  await sql`
+    INSERT INTO platform_settings (key, value, updated_at, updated_by)
+    VALUES ('live_chat', ${JSON.stringify(safeValue)}::jsonb, now(), ${actorUserId})
+    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now(), updated_by = EXCLUDED.updated_by
+  `;
+  await sql`
+    INSERT INTO audit_events (actor_user_id, action, entity_type, entity_id, details)
+    VALUES (${actorUserId}, 'live_chat.settings_updated', 'platform_setting', 'live_chat',
+      ${JSON.stringify({ enabled: safeValue.enabled, provider: safeValue.provider, propertyId: safeValue.propertyId, widgetId: safeValue.widgetId })}::jsonb)
+  `;
+  return { ok: true, value: { key: "live_chat" } };
+}
+
 export async function savePlatformSetting(
   actorUserId: string,
   key: string,
