@@ -547,60 +547,65 @@
 }
 
 @media (max-width: 900px) {
-  .shell {
-    grid-template-columns: 1fr;
-  }
-
+  .shell, .shellCollapsed { grid-template-columns: 1fr; }
   .sidebar {
-    position: static;
-    height: auto;
-    padding: 16px;
-    gap: 16px;
+    position: fixed;
+    z-index: 1002;
+    inset: 0 auto 0 0;
+    width: min(310px, calc(100vw - 52px));
+    height: 100dvh;
+    padding: 20px 16px;
+    gap: 18px;
+    transform: translateX(-105%);
+    transition: transform 220ms ease;
+    box-shadow: 18px 0 50px rgba(0,0,0,.22);
   }
-
-  .navLabel {
-    display: none;
+  .sidebarOpen { transform: translateX(0); }
+  .sidebarTop { width: 100%; }
+  .collapseButton { display: none; }
+  .mobileClose { display: grid; }
+  .mobileBackdrop {
+    display: block;
+    position: fixed;
+    z-index: 1001;
+    inset: 0;
+    border: 0;
+    background: rgba(3, 10, 6, .56);
+    backdrop-filter: blur(3px);
   }
-
+  .mobileHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 64px;
+    padding: 10px 18px;
+    background: #fff;
+    border-bottom: 1px solid #e7eee7;
+  }
+  .mobileMenuButton { background: #07170d; border-color: #07170d; }
+  .mobileHeaderTitle { font-weight: 800; color: #07170d; letter-spacing: -.02em; }
+  .mobileHeaderArea { margin-left: auto; color: #718074; font-size: 12px; }
+  .navLabel { display: block; margin: 0 0 -8px; }
   .nav {
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
-    overflow-x: auto;
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding-bottom: 4px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
   }
-
-  .nav::-webkit-scrollbar {
-    display: none;
-  }
-
-  .navItem {
-    padding: 9px 12px;
-  }
-
+  .navItem { padding: 10px 12px; }
   .sidebarFooter {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-top: 0;
+    margin-top: auto;
     padding-top: 12px;
   }
-
-  .userEmail {
-    display: none;
-  }
-
-  .signOut {
-    height: 38px;
-    padding: 0 16px;
-    flex: 0 0 auto;
-  }
-
-  .content {
-    padding: 18px;
-  }
+  .userEmail { display: block; }
+  .signOut { height: 38px; padding: 0 16px; flex: 0 0 auto; }
+  .content { padding: 18px; }
 }
 
 @media (max-width: 560px) {
