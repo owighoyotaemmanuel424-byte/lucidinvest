@@ -18,16 +18,14 @@ export async function PATCH(request: NextRequest) {
     const enabled = body.enabled;
     const propertyId = typeof body.propertyId === "string" ? body.propertyId.trim() : "";
     const widgetId = typeof body.widgetId === "string" ? body.widgetId.trim() : "";
-    const welcomeMessage = typeof body.welcomeMessage === "string" ? body.welcomeMessage.trim() : "";
 
     if (typeof enabled !== "boolean") return badRequest("Choose whether live chat should be enabled.");
     if (enabled && (!/^[a-f0-9]{16,64}$/i.test(propertyId) || !/^[a-z0-9]{6,64}$/i.test(widgetId))) {
       return badRequest("Enter a valid Tawk.to Property ID and Widget ID.");
     }
-    if (welcomeMessage.length > 120) return badRequest("Welcome message must be 120 characters or fewer.");
 
     const result = await saveLiveChatSettings(access.user.id, {
-      enabled, provider: "tawk", propertyId, widgetId, welcomeMessage,
+      enabled, provider: "tawk", propertyId, widgetId,
     });
     if (!result.ok) return NextResponse.json({ error: result.error }, { status: result.status, headers: NO_STORE });
     return NextResponse.json({ ok: true }, { headers: NO_STORE });
