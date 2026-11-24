@@ -10,8 +10,8 @@ export async function GET() {
     return NextResponse.json({
       enabled: settings.enabled,
       provider: settings.provider,
-      propertyId: settings.propertyId,
-      widgetId: settings.widgetId,
+      siteId: settings.siteId,
+      siteUrl: settings.siteUrl,
     }, {
       headers: {
         "Cache-Control": "no-store, max-age=0",
@@ -19,7 +19,7 @@ export async function GET() {
       },
     });
   } catch {
-    return NextResponse.json({ enabled: false, provider: "tawk", propertyId: "", widgetId: "" }, {
+    return NextResponse.json({ enabled: false, provider: "tawk", siteId: "", siteUrl: "" }, {
       headers: { "Cache-Control": "no-store, max-age=0" },
     });
   }
