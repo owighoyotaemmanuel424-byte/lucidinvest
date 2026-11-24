@@ -483,7 +483,6 @@ export type LiveChatSettings = {
   provider: "tawk";
   propertyId: string;
   widgetId: string;
-  welcomeMessage: string;
 };
 
 const DEFAULT_LIVE_CHAT: LiveChatSettings = {
@@ -491,7 +490,6 @@ const DEFAULT_LIVE_CHAT: LiveChatSettings = {
   provider: "tawk",
   propertyId: "6a988eb8a0ffc53446f9b976",
   widgetId: "1k1hur10v",
-  welcomeMessage: "Welcome to LucidInvest. How can we help?",
 };
 
 export async function getLiveChatSettings(): Promise<LiveChatSettings> {
@@ -505,11 +503,10 @@ export async function getLiveChatSettings(): Promise<LiveChatSettings> {
   const enabled = saved.enabled === false ? false : saved.enabled === true ? true : DEFAULT_LIVE_CHAT.enabled;
   const propertyId = typeof saved.propertyId === "string" ? saved.propertyId : DEFAULT_LIVE_CHAT.propertyId;
   const widgetId = typeof saved.widgetId === "string" ? saved.widgetId : DEFAULT_LIVE_CHAT.widgetId;
-  const welcomeMessage = typeof saved.welcomeMessage === "string" ? saved.welcomeMessage.slice(0, 120) : DEFAULT_LIVE_CHAT.welcomeMessage;
   if (!/^[a-f0-9]{16,64}$/i.test(propertyId) || !/^[a-z0-9]{6,64}$/i.test(widgetId)) {
     return { ...DEFAULT_LIVE_CHAT, enabled: false };
   }
-  return { enabled, provider: "tawk", propertyId, widgetId, welcomeMessage };
+  return { enabled, provider: "tawk", propertyId, widgetId };
 }
 
 export async function saveLiveChatSettings(
@@ -524,7 +521,6 @@ export async function saveLiveChatSettings(
     provider: "tawk",
     propertyId: value.propertyId,
     widgetId: value.widgetId,
-    welcomeMessage: value.welcomeMessage.slice(0, 120),
   };
   const sql = getSql();
   await sql`
