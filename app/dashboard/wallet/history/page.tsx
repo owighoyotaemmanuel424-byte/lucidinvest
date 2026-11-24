@@ -148,23 +148,25 @@ export default async function WalletHistoryPage({
           </div>
         )}
 
-        <div className={walletStyles.pager}>
-          <span>
-            Showing {from}–{to} of {history.total}
-          </span>
-          <div className={walletStyles.pagerLinks}>
-            {history.page > 1 && (
-              <Link className={walletStyles.filterChip} href={historyHref({ page: history.page - 1, kind, status })}>
-                ← Newer
-              </Link>
-            )}
-            {history.hasMore && (
-              <Link className={walletStyles.filterChip} href={historyHref({ page: history.page + 1, kind, status })}>
-                Older →
-              </Link>
-            )}
+        {history.total > 0 && (
+          <div className={walletStyles.pager}>
+            <span>
+              Showing {from}–{to} of {history.total}
+            </span>
+            <div className={walletStyles.pagerLinks}>
+              {history.page > 1 && (
+                <Link className={walletStyles.filterChip} href={historyHref({ page: history.page - 1, kind, status })}>
+                  ← Newer
+                </Link>
+              )}
+              {history.hasMore && (
+                <Link className={walletStyles.filterChip} href={historyHref({ page: history.page + 1, kind, status })}>
+                  Older →
+                </Link>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </section>
     </>
   );

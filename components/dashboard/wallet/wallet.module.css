@@ -581,6 +581,31 @@
 }
 
 @media (max-width: 640px) {
+  /* On phones the icon and close button would leave the copy in a sliver,
+     so the body drops to a full-width row of its own. */
+  .banner {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+  }
+
+  .bannerIcon {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .bannerClose {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .bannerBody {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
   .summaryTop {
     gap: 12px;
   }

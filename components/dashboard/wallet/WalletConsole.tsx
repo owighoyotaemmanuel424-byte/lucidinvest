@@ -540,7 +540,7 @@ export default function WalletConsole({
             className={`${styles.quickButton} ${styles.quickPrimary}`}
             onClick={() => setDialog({ type: "fund" })}
           >
-            <span aria-hidden="true">＋</span>
+            <span aria-hidden="true">+</span>
             <span>
               Fund
               <span className={styles.quickHint}>Record a deposit instruction</span>
