@@ -580,6 +580,32 @@
   }
 }
 
+@media (max-width: 480px) {
+  /* "Real account" and "Demo accounts" plus their counts cannot share a row
+     with the card padding, so the count drops under its label instead of the
+     phrase breaking mid-sentence. */
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .tab {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    padding: 8px 6px;
+    font-size: 13px;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .tabCount {
+    padding: 0 6px;
+    font-size: 11px;
+  }
+}
+
 @media (max-width: 640px) {
   /* On phones the icon and close button would leave the copy in a sliver,
      so the body drops to a full-width row of its own. */
@@ -588,6 +614,7 @@
     grid-template-columns: 40px minmax(0, 1fr);
     align-items: start;
     gap: 12px;
+    padding: 16px;
   }
 
   .bannerIcon {
@@ -614,7 +641,4 @@
     grid-template-columns: 1fr;
   }
 
-  .banner {
-    padding: 16px;
-  }
 }
