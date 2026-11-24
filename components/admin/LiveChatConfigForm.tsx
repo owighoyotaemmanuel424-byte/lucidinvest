@@ -2,13 +2,14 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/components/dashboard/dashboard.module.css";
-type Provider = "tawk" | "crisp" | "intercom" | "chatwoot";
+type Provider = "tawk" | "crisp" | "intercom" | "chatwoot" | "smartsupp";
 type Config = { enabled: boolean; provider: Provider; siteId: string; siteUrl: string };
 const PROVIDERS = [
  { value:"tawk",label:"Tawk.to",description:"Hosted live chat and agent inbox.",idLabel:"Property ID / Widget ID",placeholder:"propertyId/widgetId" },
  { value:"crisp",label:"Crisp",description:"Crisp website chat inbox.",idLabel:"Website ID",placeholder:"Your Crisp Website ID" },
  { value:"intercom",label:"Intercom",description:"Intercom Messenger for customer support.",idLabel:"App ID",placeholder:"Your Intercom App ID" },
  { value:"chatwoot",label:"Chatwoot",description:"Open-source support inbox, cloud or self-hosted.",idLabel:"Website Token",placeholder:"Your Chatwoot Website Token",urlLabel:"Chatwoot base URL" },
+ { value:"smartsupp",label:"Smartsupp",description:"Smartsupp live chat and customer messaging.",idLabel:"Smartsupp Chat Code",placeholder:"Your Smartsupp key" },
 ] as const;
 export default function LiveChatConfigForm({initial}:{initial:Config}) {
  const router=useRouter(); const [config,setConfig]=useState(initial); const [busy,setBusy]=useState(false);
